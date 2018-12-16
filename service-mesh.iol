@@ -1,12 +1,12 @@
-#########
-# Health check of jolie service
+// #########
+// # Health check of jolie service
 interface ServiceMeshInterface {
     RequestResponse: 
         health(void)(string)
 }
 
-#########
-# Consul KV storage
+// #########
+// # Consul KV storage
 type ConsulKey: void {
     .key: string
 }
