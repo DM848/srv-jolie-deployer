@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+
+  {{ service.name }}:
+    build: .
+    image: dm848/srv-{{ service.name }}v1
