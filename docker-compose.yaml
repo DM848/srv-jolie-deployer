@@ -4,4 +4,4 @@ services:
 
   {{ service.name }}:
     build: .
-    image: dm848/srv-{{ service.name }}v1
+    image: dm848/srv-{{ service.name }}:v1
