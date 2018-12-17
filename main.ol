@@ -20,7 +20,7 @@ inputPort {{ service.name.Capitalize() }}Input {
   Location: "socket://localhost:{{ service.port }}/"
   Protocol: http
   Interfaces: 
-    {{ service.name.Capitalize() }}Interface, 
+    {{ service.name.Capitalize().LettersOnly() }}Interface, 
     ServiceMeshInterface
 }
 
@@ -40,7 +40,7 @@ main
     }]
     [ about()( resp ) {
         resp = "
-            The service {{ service.name }} was created at {{ service.createdAt }} by {{ service.creator }}.
+            The service {{ service.name }} was created at {{ service.createdAt }} by {{ service.author }}.
             The source code can be found at https://github.com/dm848/srv-{{ service.name }}
             While other services in the cluster (in the same namespace) can access it using the DNS name {{ service.name }}.
             Remember to specify the cluster namespace, if you are in a different namespace: {{ service.name }}.default
