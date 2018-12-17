@@ -16,7 +16,7 @@ execution { sequential }
 
 // The input port specifies how your service can be reached. However, since we use
 // Docker containers, the port here should not be set as it is exposed in the Dockerfile.
-inputPort {{ service.name.Capitalize() }}Input {
+inputPort {{ service.name.Capitalize().LettersOnly() }}Input {
   Location: "socket://localhost:{{ service.port }}/"
   Protocol: http
   Interfaces: 
