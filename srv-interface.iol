@@ -1,4 +1,4 @@
-interface {{ service.name.Capitalize().LettersOnly() }}Interface {
+interface JolieDeployerInterface {
   RequestResponse:
     about(void)(string)
 }

@@ -1,2 +1,1 @@
-# srv-{{ service.name }}
-{{ service.desc }}
+# srv-jolie-deployer

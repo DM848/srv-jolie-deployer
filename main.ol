@@ -16,11 +16,11 @@ execution { sequential }
 
 // The input port specifies how your service can be reached. However, since we use
 // Docker containers, the port here should not be set as it is exposed in the Dockerfile.
-inputPort {{ service.name.Capitalize().LettersOnly() }}Input {
-  Location: "socket://localhost:{{ service.port }}/"
+inputPort JolieDeployerInput {
+  Location: "socket://localhost:8000/"
   Protocol: http
   Interfaces: 
-    {{ service.name.Capitalize().LettersOnly() }}Interface, 
+    JolieDeployerInterface, 
     ServiceMeshInterface
 }
 
@@ -29,7 +29,7 @@ inputPort {{ service.name.Capitalize().LettersOnly() }}Input {
 // the service is started.
 init
 {
-    println@Console( "initialising {{ service.name }}")()
+    println@Console( "initialising jolie-deployer")()
 }
 
 // incomming requests
@@ -40,13 +40,13 @@ main
     }]
     [ about()( resp ) {
         resp = "
-            The service {{ service.name }} was created at {{ service.createdAt }} by {{ service.author }}.
-            The source code can be found at https://github.com/dm848/srv-{{ service.name }}
-            While other services in the cluster (in the same namespace) can access it using the DNS name {{ service.name }}.
-            Remember to specify the cluster namespace, if you are in a different namespace: {{ service.name }}.default
+            The service jolie-deployer was created at 2018-12-17 17:06:56.381035722 +0000 UTC m=+17210.707684485 by joel.
+            The source code can be found at https://github.com/dm848/srv-jolie-deployer
+            While other services in the cluster (in the same namespace) can access it using the DNS name jolie-deployer.
+            Remember to specify the cluster namespace, if you are in a different namespace: jolie-deployer.default
 
             Service Description
-            {{ service.desc }}
+            
         "
     }]
 }
