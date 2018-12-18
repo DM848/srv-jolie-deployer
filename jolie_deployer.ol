@@ -146,7 +146,7 @@ spec:
 
 
     answer.ip = string(PubIP);
-    answer.token = token;
+    answer.token = token
 
     /*
     //log action
@@ -170,7 +170,7 @@ spec:
 
         //undeploy from cluster
         exec@Exec("kubectl delete deployment deployment"+ request.token + " --grace-period=" + request.gracePeriod)();
-        exec@Exec("kubectl delete service service" + request.token)();
+        exec@Exec("kubectl delete service service" + request.token)()
 
 /*
         //remove file
