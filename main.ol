@@ -202,7 +202,7 @@ spec:
         readFile@File( { .filename = token + ".ol" } )( program )
 
     }]
-    
+    /*
     [ about()( resp ) {
         resp = "
             The service jolie-deployer was created at 2018-12-17 17:06:56.381035722 +0000 UTC m=+17210.707684485 by joel.
@@ -214,4 +214,5 @@ spec:
             
         "
     }]
+    */
 }
