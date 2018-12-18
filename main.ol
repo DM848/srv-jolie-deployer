@@ -202,16 +202,4 @@ spec:
         readFile@File( { .filename = token + ".ol" } )( program )
 
     }]
-    
-    [ about()( resp ) {
-        resp = "
-            The service jolie-deployer was created at 2018-12-17 17:06:56.381035722 +0000 UTC m=+17210.707684485 by joel.
-            The source code can be found at https://github.com/dm848/srv-jolie-deployer
-            While other services in the cluster (in the same namespace) can access it using the DNS name jolie-deployer.
-            Remember to specify the cluster namespace, if you are in a different namespace: jolie-deployer.default
-
-            Service Description
-            
-        "
-    }]
 }
