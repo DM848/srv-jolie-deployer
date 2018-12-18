@@ -25,7 +25,7 @@ inputPort JolieDeployerInput {
   Protocol: http {.format = "raw"}
   Interfaces: 
     User_Service_Interface,
-    JolieDeployerInterface, 
+    Jolie_Deployer_Interface, 
     ServiceMeshInterface
 }
 
