@@ -16,7 +16,7 @@ include "string_utils.iol"
 // first input statement can receive a message.
 //
 // execution { single | concurrent | sequential }
-execution { sequential }
+execution { concurrent }
 
 // The input port specifies how your service can be reached. However, since we use
 // Docker containers, the port here should not be set as it is exposed in the Dockerfile.
