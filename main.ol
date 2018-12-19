@@ -83,6 +83,7 @@ spec:
     metadata:
       labels:
         app: " + token + "
+        user: " + request.user + "
     spec:
       containers:
       - name: " + token + "
@@ -163,7 +164,6 @@ spec:
 
 
 
-
     answer.ip = string(PubIP);
     answer.token = token
 
@@ -176,6 +176,11 @@ spec:
     */
 
     }]
+    
+    [statusUserProgram(user)(response){
+        response = "Not implemented yet"
+        
+        }]
     
     [unload(request)(){
 

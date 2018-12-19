@@ -1,5 +1,5 @@
 include "console.iol"
-include "jolie_deployer_interface.iol"
+include "../jolie_deployer_interface.iol"
 include "file.iol"
 
 
