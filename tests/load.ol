@@ -1,11 +1,12 @@
 include "console.iol"
 include "../jolie_deployer_interface.iol"
 include "file.iol"
+include "json_utils.iol"
 
 
 outputPort JolieDeployer {
-Location: "socket://35.228.143.225:80/api/jolie-deployer/"
-//Location: "socket://localhost:8000/"
+//Location: "socket://35.228.143.225:80/api/jolie-deployer/"
+Location: "socket://localhost:8000/"
 Protocol: http
 Interfaces: Jolie_Deployer_Interface
 }
@@ -36,13 +37,20 @@ main
         }
     };
 
+
+    loadreq.user = "Kurt";
+    loadreq.name = "kurtsPrinterService";
+    loadreq.healthcheck = hc;
+    loadreq.replicas = replicas;
+    loadreq.ports[0] = 400;
+    
+    getJsonString@JsonUtils(loadreq)(jsonstring);
+    
+    println@Console(jsonstring)();
+    
     //load program in the cluster
     load@JolieDeployer({
-      .user = "Kurt",
-      .name = "kurtsPrinterService",
-      .healthcheck = hc,
-      .manifest = "Jolie",
-      .replicas = replicas,
+      .manifest = jsonstring,
       .program = program,
       .ports[0] = 4000
     })(response);

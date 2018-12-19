@@ -1,10 +1,10 @@
 type UserLoadRequest:void {
-  .user:string
-  .name:string
-  .healthcheck:bool
-  .program:string
-  .manifest:string
-  .replicas:int
+  .user?: string
+  .name?: string
+  .healthcheck?: bool
+  .program: string
+  .manifest: string
+  .replicas?: int
   .ports[1, *]: int
 }
 

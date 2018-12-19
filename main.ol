@@ -7,6 +7,7 @@ include "exec.iol"
 include "jolie_deployer_interface.iol"
 include "file.iol"
 include "string_utils.iol"
+include "json_utils.iol"
 
 // single is the default execution modality (so the execution construct can be omitted),
 // which runs the program behaviour once. sequential, instead, causes the program behaviour
@@ -42,6 +43,12 @@ main
 {
     [load(request)(answer){
 
+        //All user specifications lies in request.manifest
+        
+        getJsonValue@JsonUtils(request.manifest)(manifest);
+        
+
+
 
         token = new;    //unique token that is used inside the cluster to
                         //identify this service + deployment
@@ -49,7 +56,7 @@ main
         //save the program, to be returned when the service asks for it
         writeFile@File({.content = request.program, .filename = token + ".ol"})();
 
-        if (request.healthcheck)
+        if (manifest.healthcheck)
         {
             stringhealthcheck =         
 "        livenessProbe:
@@ -74,9 +81,9 @@ metadata:
   name: deployment" + token + "
   labels:
     app: " + token + "
-    user: " + request.user + "
+    user: " + manifest.user + "
 spec:
-  replicas: " + request.replicas + "
+  replicas: " + manifest.replicas + "
   selector:
     matchLabels:
       app: " + token + "
@@ -111,7 +118,7 @@ spec:
   - name: host
     port: 8000
     targetPort: 8000\n";
-    for ( port in request.ports)
+    for ( port in manifest.ports)
     {
         serviceString = serviceString +
 "  - name: " + new + "
