@@ -7,6 +7,7 @@ include "exec.iol"
 include "jolie_deployer_interface.iol"
 include "file.iol"
 include "string_utils.iol"
+include "json_utils.iol"
 
 // single is the default execution modality (so the execution construct can be omitted),
 // which runs the program behaviour once. sequential, instead, causes the program behaviour
@@ -23,9 +24,9 @@ execution { concurrent }
 inputPort JolieDeployerInput {
   Location: "socket://localhost:8000/"
   Protocol: http {.format = "raw"}
-  Interfaces: 
+  Interfaces:
     User_Service_Interface,
-    Jolie_Deployer_Interface, 
+    Jolie_Deployer_Interface,
     ServiceMeshInterface
 }
 
@@ -47,11 +48,42 @@ main
                         //identify this service + deployment
 
         //save the program, to be returned when the service asks for it
-        writeFile@File({.content = request.program, .filename = token + ".ol"})();
+        exec@Exec("sh get_cpu.sh")(response);
+        undef( response.exitCode);
+        response.regex = "[ ]";
+        split@StringUtils(response)(res);
 
-        if (request.healthcheck)
-        {
-            stringhealthcheck =         
+        // getting string back as 1 1 1 1 1 1 1 900 940 870 893 640 940 778
+        max_free = 0;
+        for ( i = 0, i < #res.result/2, i++){
+          // cpu_string = res.result[i];
+          // length@StringUtils(string(cpu_string))(length);
+          //
+          // res.result[i].end = length - 1;
+          // res.result[i].begin = 0;
+          // substring@StringUtils(res.result[i])(cleaned);
+
+          current_free = int(res.result[i])*1000 - int(res.result[i + #res.result/2]);
+          println@Console(current_free)();
+
+          if (current_free > max_free){
+            max_free = current_free
+          }
+        };
+
+        if (max_free < request.cpu_min){
+          println@Console("requested cpu not available")();
+          answer.status = -1
+        } else {
+          println@Console("requested cpu available")();
+          // getJsonValue@JsonUtils(response)(json_obj);
+          // println@Console(json_obj)()
+
+          writeFile@File({.content = request.program, .filename = token + ".ol"})();
+
+          if (request.healthcheck)
+          {
+              stringhealthcheck =
 "        livenessProbe:
           exec:
             command:
@@ -60,14 +92,14 @@ main
             - /alive.sh
           initialDelaySeconds: 15
           periodSeconds: 10\n"
-        }
-        else
-        {
-            stringhealthcheck = ""
-        };
+          }
+          else
+          {
+              stringhealthcheck = ""
+          };
 
-        writeFile@File ({
-      .content =
+          writeFile@File ({
+        .content =
 "apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -92,12 +124,17 @@ spec:
         - name: TOKEN
           value: " + token + "
         ports:
-        - containerPort: 8000\n" + 
-        stringhealthcheck, 
-      .filename = "deployment.yaml"
-    } )();
+        - containerPort: 8000\n" +
+          stringhealthcheck +"
+        resources:
+          limits:
+            cpu: " + double(request.cpu_max) / 1000 + "
+          requests:
+            cpu: " + double(request.cpu_min) / 1000 +"\n",
+        .filename = "deployment.yaml"
+      } )();
 
-    serviceString =
+      serviceString =
 "apiVersion: v1
 kind: Service
 metadata:
@@ -110,73 +147,75 @@ spec:
   - name: host
     port: 8000
     targetPort: 8000\n";
-    for ( port in request.ports)
-    {
-        serviceString = serviceString +
+      for ( port in request.ports)
+      {
+          serviceString = serviceString +
 "  - name: " + new + "
     port: "+ port +"
     targetPort: " + port + "\n"
-};
+  };
 
-    serviceString = serviceString +
+      serviceString = serviceString +
 "  selector:
     app: " + token + "
   type: LoadBalancer\n";
 
-    writeFile@File({.content = serviceString, .filename = "service.yaml"})();
+      writeFile@File({.content = serviceString, .filename = "service.yaml"})();
 
 
-    //create new deployment and service
-    exec@Exec("kubectl create -f deployment.yaml")(execResponse);
-    println@Console(execResponse)();
-    exec@Exec("kubectl create -f service.yaml")(execResponse);
-    print@Console(execResponse)();
-
-
-
-    //Following while-loop blocks until the kubernetes cluster
-    //has allocated a new public ip. This usually takes 60 seconds
-
-    matches = 0;
-    while (matches == 0)
-    {
-        cmdstring = "kubectl describe service service" + token;
-        exec@Exec(cmdstring)(response);
-
-
-        item = string(response);
-        item.regex = "(?s).*(Ingress:     [0-9]*.[0-9]*.[0-9]*.[0-9]*)(?s).*";
-
-        match@StringUtils(item)(matches);
-
-        sleep@Time(3000)();
-        println@Console("wating for IP...")()
-    };
-
-    println@Console(matches.group[1])();
-
-    substr = matches.group[1];
-    substr.begin = 13;
-    substr.end = 100;
-    substring@StringUtils(substr)(PubIP);
+      //create new deployment and service
+      exec@Exec("kubectl create -f deployment.yaml")(execResponse);
+      println@Console(execResponse)();
+      exec@Exec("kubectl create -f service.yaml")(execResponse);
+      print@Console(execResponse)();
 
 
 
+      //Following while-loop blocks until the kubernetes cluster
+      //has allocated a new public ip. This usually takes 60 seconds
+
+      matches = 0;
+      while (matches == 0)
+      {
+          cmdstring = "kubectl describe service service" + token;
+          exec@Exec(cmdstring)(response);
 
 
-    answer.ip = string(PubIP);
-    answer.token = token
+          item = string(response);
+          item.regex = "(?s).*(Ingress:     [0-9]*.[0-9]*.[0-9]*.[0-9]*)(?s).*";
 
-    /*
-    //log action
-    logentry.service = "jolie-deployer";
-    logentry.info = "Loaded service, user: " + request.user + ", token: " + token;
-    logentry.level = 5;
-    set@Logger(logentry)()
-    */
+          match@StringUtils(item)(matches);
+
+          sleep@Time(3000)();
+          println@Console("wating for IP...")()
+      };
+
+      println@Console(matches.group[1])();
+
+      substr = matches.group[1];
+      substr.begin = 13;
+      substr.end = 100;
+      substring@StringUtils(substr)(PubIP);
+
+
+
+
+
+      answer.ip = string(PubIP);
+      answer.token = token;
+      answer.status = 0
+
+      /*
+      //log action
+      logentry.service = "jolie-deployer";
+      logentry.info = "Loaded service, user: " + request.user + ", token: " + token;
+      logentry.level = 5;
+      set@Logger(logentry)()
+      */
+        }
 
     }]
-    
+
     [unload(request)(){
 
         println@Console("Im undeploying")();
@@ -188,14 +227,12 @@ spec:
         //undeploy from cluster
         exec@Exec("kubectl delete deployment deployment"+ request.token + " --grace-period=" + request.gracePeriod)();
         exec@Exec("kubectl delete service service" + request.token)()
-
-        
     }]
-    
+
     [ health() ( resp ) {
         resp = "Service alive and reachable"
     }]
-    
+
     [getProgram(token)(program){
         println@Console("some user service is asking for a program")();
 

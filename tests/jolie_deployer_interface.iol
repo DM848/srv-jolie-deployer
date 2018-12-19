@@ -6,6 +6,10 @@ type UserLoadRequest:void {
   .manifest:string
   .replicas:int
   .ports[1, *]: int
+  .cpu_min: int
+  .cpu_max: int
+  .mem_min: int
+  .mem_max: int
 }
 
 type UserUnloadRequest:void {
@@ -16,8 +20,9 @@ type UserUnloadRequest:void {
 }
 
 type UserLoadResponse:void {
-    .ip:string
-    .token:string
+    .ip?:string
+    .token?:string
+    .status:int
 }
 
 interface Jolie_Deployer_Interface
@@ -27,4 +32,3 @@ interface Jolie_Deployer_Interface
       unload(UserUnloadRequest)(void),
       health(void)(undefined)
 }
-

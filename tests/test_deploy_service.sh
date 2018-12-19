@@ -24,10 +24,10 @@ echo $message
 sleep 3
 jolie unload.ol $token
 
-if [ "$message" == "This is from server" ]; then 
-    echo "Message was equal" 
+if [ "$message" == "This is from server" ]; then
+    echo "Message was equal"
     ret=0
-else 
+else
     echo "Message not equal"
     ret=1
 fi
@@ -36,10 +36,10 @@ sleep 3
 
 message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null)
 
-if [ "$message" != "This is from server" ]; then 
-    echo "Service undeployed" 
+if [ "$message" != "This is from server" ]; then
+    echo "Service undeployed"
     exit $ret;
-else 
+else
     echo "Message not undeployed!"
     exit 1;
 fi
