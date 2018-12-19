@@ -177,7 +177,7 @@ spec:
 
     }]
     
-    [statusUserProgram(user)(response){
+    [statusUserPrograms(user)(response){
         response = "Not implemented yet"
         
         }]
