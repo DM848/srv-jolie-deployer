@@ -178,7 +178,11 @@ spec:
     }]
     
     [statusUserPrograms(user)(response){
-        response = "Not implemented yet"
+    //    response = "Not implemented yet"
+    
+        exec@Exec("kubectl get deployments -l user=" + user)(cmdresp);
+        str = string(cmdresp);
+        response = cmdresp
         
         }]
     
