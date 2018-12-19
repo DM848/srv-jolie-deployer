@@ -74,6 +74,7 @@ metadata:
   name: deployment" + token + "
   labels:
     app: " + token + "
+    user: " + request.user + "
 spec:
   replicas: " + request.replicas + "
   selector:
@@ -83,7 +84,6 @@ spec:
     metadata:
       labels:
         app: " + token + "
-        user: " + request.user + "
     spec:
       containers:
       - name: " + token + "
