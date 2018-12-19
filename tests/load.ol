@@ -5,8 +5,8 @@ include "json_utils.iol"
 
 
 outputPort JolieDeployer {
-//Location: "socket://35.228.143.225:80/api/jolie-deployer/"
-Location: "socket://localhost:8000/"
+Location: "socket://35.228.143.225:80/api/jolie-deployer/"
+//Location: "socket://localhost:8000/"
 Protocol: http
 Interfaces: Jolie_Deployer_Interface
 }
@@ -42,11 +42,10 @@ main
     loadreq.name = "kurtsPrinterService";
     loadreq.healthcheck = hc;
     loadreq.replicas = replicas;
-    loadreq.ports[0] = 400;
+    loadreq.ports[0] = 4000;
     
     getJsonString@JsonUtils(loadreq)(jsonstring);
     
-    println@Console(jsonstring)();
     
     //load program in the cluster
     load@JolieDeployer({
