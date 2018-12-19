@@ -43,6 +43,12 @@ main
 {
     [load(request)(answer){
 
+        //All user specifications lies in request.manifest
+
+        getJsonValue@JsonUtils(request.manifest)(manifest);
+
+
+
 
         token = new;    //unique token that is used inside the cluster to
                         //identify this service + deployment
@@ -81,9 +87,9 @@ main
 
           writeFile@File({.content = request.program, .filename = token + ".ol"})();
 
-          if (request.healthcheck)
-          {
-              stringhealthcheck =
+        if (manifest.healthcheck)
+        {
+            stringhealthcheck =
 "        livenessProbe:
           exec:
             command:
@@ -106,8 +112,9 @@ metadata:
   name: deployment" + token + "
   labels:
     app: " + token + "
+    user: " + manifest.user + "
 spec:
-  replicas: " + request.replicas + "
+  replicas: " + manifest.replicas + "
   selector:
     matchLabels:
       app: " + token + "
@@ -147,9 +154,9 @@ spec:
   - name: host
     port: 8000
     targetPort: 8000\n";
-      for ( port in request.ports)
-      {
-          serviceString = serviceString +
+    for ( port in manifest.ports)
+    {
+        serviceString = serviceString +
 "  - name: " + new + "
     port: "+ port +"
     targetPort: " + port + "\n"
@@ -200,7 +207,6 @@ spec:
 
 
 
-
       answer.ip = string(PubIP);
       answer.token = token;
       answer.status = 0
@@ -215,6 +221,14 @@ spec:
         }
 
     }]
+    [statusUserPrograms(user)(response){
+    //    response = "Not implemented yet"
+
+        exec@Exec("kubectl get deployments -l user=" + user)(cmdresp);
+        str = string(cmdresp);
+        response = cmdresp
+
+        }]
 
     [unload(request)(){
 

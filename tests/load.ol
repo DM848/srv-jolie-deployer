@@ -1,6 +1,7 @@
 include "console.iol"
-include "jolie_deployer_interface.iol"
+include "../jolie_deployer_interface.iol"
 include "file.iol"
+include "json_utils.iol"
 
 
 outputPort JolieDeployer {
@@ -36,13 +37,19 @@ main
         }
     };
 
+
+    loadreq.user = "Kurt";
+    loadreq.name = "kurtsPrinterService";
+    loadreq.healthcheck = hc;
+    loadreq.replicas = replicas;
+    loadreq.ports[0] = 4000;
+    
+    getJsonString@JsonUtils(loadreq)(jsonstring);
+    
+    
     //load program in the cluster
     load@JolieDeployer({
-      .user = "Kurt",
-      .name = "kurtsPrinterService",
-      .healthcheck = hc,
-      .manifest = "Jolie",
-      .replicas = replicas,
+      .manifest = jsonstring,
       .program = program,
       .ports[0] = 4000,
       .cpu_min = 150,
