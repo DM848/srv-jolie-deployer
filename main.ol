@@ -64,13 +64,17 @@ main
                         //identify this service + deployment
 
         // get free cpu
+        println@Console("get cpu ussage")();
         exec@Exec("sh get_cpu.sh")(response);
+        println@Console(response)();
         undef( response.exitCode);
         response.regex = "[ ]";
+        println@Console("split response")();
         split@StringUtils(response)(res);
 
         // getting string back as 1 1 1 1 1 1 1 900 940 870 893 640 940 778
         // find max free cpu
+        println@Console("find max cpu")();
         max_free_cpu = 0;
         for ( i = 0, i < #res.result/2, i++){
           current_free = int(res.result[i])*1000 - int(res.result[i + #res.result/2]);
@@ -81,18 +85,26 @@ main
         };
 
         // get free memory
+        println@Console("get mem ussage")();
         exec@Exec("sh get_memory.sh")(response);
+        println@Console(response)();
         undef(response.exitCode);
         response.regex = "[ ]";
+        println@Console("split response")();
         split@StringUtils(response)(res);
 
         // getting string back as 1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki, 616Mi 506Mi 440Mi 660Mi 506Mi 506Mi 821000Ki
         // clean it first converting all to MB
+        println@Console("clean mem")();
         for ( i = 0, i < #res.result, i++){
+
+          println@Console("trim mem entry")();
           trim@StringUtils(res.result[i])(res.result[i]);
+          println@Console("length mem entry")();
           length@StringUtils(res.result[i])(length);
           res.result[i].end = length - 2;
           res.result[i].begin = 0;
+          println@Console("substring mem entry")();
           substring@StringUtils(res.result[i])(cleaned);
 
           check = res.result[i];
@@ -102,9 +114,11 @@ main
             res.result[i] = int(double(cleaned) / 1000)
           } else {
             res.result[i] = int(cleaned)
-          }
+          };
+          println@Console(res.result[i])()
         };
 
+        println@Console("find max free mem")();
         // find max free memory
         max_free_mem = 0;
         for ( i = 0, i < #res.result/2, i++){
@@ -129,6 +143,7 @@ main
 
           //save the program, to be returned when the service asks for it
           //write file to disk, so it can be retrieved when cloud_server needs it
+          println@Console("write file")();
           writeFile@File({.content = request.program, .filename = token + ".ol"})();
 
           //testing to use the PV
