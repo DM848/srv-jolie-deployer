@@ -9,6 +9,7 @@ include "file.iol"
 include "string_utils.iol"
 include "json_utils.iol"
 include "cloud_server_iface.iol"
+include "srv-disk-writer.iol"
 
 // single is the default execution modality (so the execution construct can be omitted),
 // which runs the program behaviour once. sequential, instead, causes the program behaviour
@@ -30,6 +31,13 @@ inputPort JolieDeployerInput {
     Jolie_Deployer_Interface,
     ServiceMeshInterface
 }
+
+outputPort Writer {
+    Location: "socket://jolie-disk-writer:8020/"
+    Protocol: http
+    Interfaces: DiskWriterInterface
+}
+
 
 outputPort UserService {
     Protocol: http
@@ -91,7 +99,13 @@ main
           // getJsonValue@JsonUtils(response)(json_obj);
           // println@Console(json_obj)()
 
+
+          //write file to disk, so it can be retrieved when cloud_server needs it
           writeFile@File({.content = request.program, .filename = token + ".ol"})();
+          
+          //testing to use the PV
+          writeProgram@Writer({.content = request.program, .filename = token + ".ol"})(write_resp);
+          println@Console(write_resp)();
 
         if (manifest.healthcheck)
         {
