@@ -8,6 +8,8 @@ include "jolie_deployer_interface.iol"
 include "file.iol"
 include "string_utils.iol"
 include "json_utils.iol"
+include "cloud_server_iface.iol"
+include "srv-disk-writer.iol"
 
 // single is the default execution modality (so the execution construct can be omitted),
 // which runs the program behaviour once. sequential, instead, causes the program behaviour
@@ -28,6 +30,18 @@ inputPort JolieDeployerInput {
     User_Service_Interface,
     Jolie_Deployer_Interface,
     ServiceMeshInterface
+}
+
+outputPort Writer {
+    Location: "socket://jolie-disk-writer:8020/"
+    Protocol: http
+    Interfaces: DiskWriterInterface
+}
+
+
+outputPort UserService {
+    Protocol: http
+    Interfaces: CloudServerIface
 }
 
 // The init{} scope allows the specification of initialisation procedures (before the web server
@@ -115,7 +129,12 @@ main
           println@Console("requested cpu + memory available")();
 
           //save the program, to be returned when the service asks for it
+          //write file to disk, so it can be retrieved when cloud_server needs it
           writeFile@File({.content = request.program, .filename = token + ".ol"})();
+
+          //testing to use the PV
+          writeProgram@Writer({.content = request.program, .filename = token + ".ol"})(write_resp);
+          println@Console(write_resp)();
 
         if (manifest.healthcheck)
         {
@@ -264,6 +283,12 @@ spec:
 
         //NOTE maybe we should check that the program that should be undeployed
         // matches one that exists, so check the tags/ip in the deployment
+
+        //tell the cloud_server it's going to be unloaded
+        UserService.location = "socket://service" + request.token + ":8000/";
+        unload@UserService()(resp);
+        println@Console("User program say: " + resp)();
+
 
         //undeploy from cluster
         exec@Exec("kubectl delete deployment deployment"+ request.token + " --grace-period=" + request.gracePeriod)();
