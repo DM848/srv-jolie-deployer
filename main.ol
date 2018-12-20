@@ -144,11 +144,11 @@ main
           //save the program, to be returned when the service asks for it
           //write file to disk, so it can be retrieved when cloud_server needs it
           println@Console("write file")();
-          writeFile@File({.content = request.program, .filename = token + ".ol"})();
+          // writeFile@File({.content = request.program, .filename = token + ".ol"})();
 
           //testing to use the PV
-          writeProgram@Writer({.content = request.program, .filename = token + ".ol"})(write_resp);
-          println@Console(write_resp)();
+          // writeProgram@Writer({.content = request.program, .filename = token + ".ol"})(write_resp);
+          // println@Console(write_resp)();
 
         if (manifest.healthcheck)
         {
