@@ -1,15 +1,6 @@
 type UserLoadRequest:void {
-  .user?: string
-  .name?: string
-  .healthcheck?: bool
   .program: string
   .manifest: string
-  .replicas?: int
-  .ports[1, *]: int
-  .cpu_min:int
-  .cpu_max:int
-  .mem_min:int
-  .mem_max:int
 }
 
 type UserUnloadRequest:void {

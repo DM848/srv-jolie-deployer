@@ -44,47 +44,77 @@ main
     [load(request)(answer){
 
         //All user specifications lies in request.manifest
-
         getJsonValue@JsonUtils(request.manifest)(manifest);
-
-
 
 
         token = new;    //unique token that is used inside the cluster to
                         //identify this service + deployment
 
-        //save the program, to be returned when the service asks for it
+        // get free cpu
         exec@Exec("sh get_cpu.sh")(response);
         undef( response.exitCode);
         response.regex = "[ ]";
         split@StringUtils(response)(res);
 
         // getting string back as 1 1 1 1 1 1 1 900 940 870 893 640 940 778
-        max_free = 0;
+        // find max free cpu
+        max_free_cpu = 0;
         for ( i = 0, i < #res.result/2, i++){
-          // cpu_string = res.result[i];
-          // length@StringUtils(string(cpu_string))(length);
-          //
-          // res.result[i].end = length - 1;
-          // res.result[i].begin = 0;
-          // substring@StringUtils(res.result[i])(cleaned);
-
           current_free = int(res.result[i])*1000 - int(res.result[i + #res.result/2]);
-          println@Console(current_free)();
 
-          if (current_free > max_free){
-            max_free = current_free
+          if (current_free > max_free_cpu){
+            max_free_cpu = current_free
           }
         };
 
-        if (max_free < request.cpu_min){
+        // get free memory
+        exec@Exec("sh get_memory.sh")(response);
+        undef(response.exitCode);
+        response.regex = "[ ]";
+        split@StringUtils(response)(res);
+
+        // getting string back as 1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki, 616Mi 506Mi 440Mi 660Mi 506Mi 506Mi 821000Ki
+        // clean it first converting all to MB
+        for ( i = 0, i < #res.result, i++){
+          trim@StringUtils(res.result[i])(res.result[i]);
+          length@StringUtils(res.result[i])(length);
+          res.result[i].end = length - 2;
+          res.result[i].begin = 0;
+          substring@StringUtils(res.result[i])(cleaned);
+
+          check = res.result[i];
+          check.substring = "Ki";
+          contains@StringUtils(check)(isKi);
+          if (isKi){
+            res.result[i] = int(double(cleaned) / 1000)
+          } else {
+            res.result[i] = int(cleaned)
+          }
+        };
+
+        // find max free memory
+        max_free_mem = 0;
+        for ( i = 0, i < #res.result/2, i++){
+          current_free = res.result[i] - res.result[i + #res.result/2];
+
+          if (current_free > max_free_mem){
+            max_free_mem = current_free
+          }
+        };
+
+        // check that there is enough cpu
+        if (max_free_cpu < manifest.cpu_min){
           println@Console("requested cpu not available")();
           answer.status = -1
+        }
+        // check that there is enough memory
+        else if (max_free_mem < manifest.mem_min){
+          println@Console("requested memory not available")();
+          answer.status = -1
         } else {
-          println@Console("requested cpu available")();
-          // getJsonValue@JsonUtils(response)(json_obj);
-          // println@Console(json_obj)()
+          println@Console("requested cpu + memory available")();
 
+          //save the program, to be returned when the service asks for it
           writeFile@File({.content = request.program, .filename = token + ".ol"})();
 
         if (manifest.healthcheck)
@@ -135,9 +165,11 @@ spec:
           stringhealthcheck +"
         resources:
           limits:
-            cpu: " + double(request.cpu_max) / 1000 + "
+            cpu: " + double(manifest.cpu_max) / 1000 + "
+            memory: "+ manifest.mem_max + "Mi
           requests:
-            cpu: " + double(request.cpu_min) / 1000 +"\n",
+            cpu: " + double(manifest.cpu_min) / 1000 +"
+            memory: "+ manifest.mem_min + "Mi\n",
         .filename = "deployment.yaml"
       } )();
 
@@ -169,13 +201,11 @@ spec:
 
       writeFile@File({.content = serviceString, .filename = "service.yaml"})();
 
-
       //create new deployment and service
       exec@Exec("kubectl create -f deployment.yaml")(execResponse);
       println@Console(execResponse)();
       exec@Exec("kubectl create -f service.yaml")(execResponse);
       print@Console(execResponse)();
-
 
 
       //Following while-loop blocks until the kubernetes cluster
@@ -204,12 +234,9 @@ spec:
       substr.end = 100;
       substring@StringUtils(substr)(PubIP);
 
-
-
-
       answer.ip = string(PubIP);
       answer.token = token;
-      answer.status = 0
+      answer.status = 0 // no error
 
       /*
       //log action
