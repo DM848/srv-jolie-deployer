@@ -143,12 +143,12 @@ main
 
           //save the program, to be returned when the service asks for it
           //write file to disk, so it can be retrieved when cloud_server needs it
-          println@Console("write file")();
-          // writeFile@File({.content = request.program, .filename = token + ".ol"})();
+          //println@Console("write file")();
+          //writeFile@File({.content = request.program, .filename = token + ".ol"})();
 
-          //testing to use the PV
-          // writeProgram@Writer({.content = request.program, .filename = token + ".ol"})(write_resp);
-          // println@Console(write_resp)();
+          //write in persistant storage
+          writeProgram@Writer({.content = request.program, .filename = token + ".ol"})(write_resp);
+          println@Console(write_resp)();
 
         if (manifest.healthcheck)
         {
@@ -304,6 +304,8 @@ spec:
         println@Console("User program say: " + resp)();
 
 
+        //TODO remove program from persistant storage
+
         //undeploy from cluster
         exec@Exec("kubectl delete deployment deployment"+ request.token + " --grace-period=" + request.gracePeriod)();
         exec@Exec("kubectl delete service service" + request.token)()
@@ -316,7 +318,8 @@ spec:
     [getProgram(token)(program){
         println@Console("some user service is asking for a program")();
 
-        readFile@File( { .filename = token + ".ol" } )( program )
+        //readFile@File( { .filename = token + ".ol" } )( program )
+        getProgram@Writer(token)(program)
 
     }]
 }
