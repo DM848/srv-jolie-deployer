@@ -8,6 +8,7 @@ include "jolie_deployer_interface.iol"
 include "file.iol"
 include "string_utils.iol"
 include "json_utils.iol"
+include "cloud_server_iface.iol"
 
 // single is the default execution modality (so the execution construct can be omitted),
 // which runs the program behaviour once. sequential, instead, causes the program behaviour
@@ -28,6 +29,11 @@ inputPort JolieDeployerInput {
     User_Service_Interface,
     Jolie_Deployer_Interface,
     ServiceMeshInterface
+}
+
+outputPort UserService {
+    Protocol: http
+    Interfaces: CloudServerIface
 }
 
 // The init{} scope allows the specification of initialisation procedures (before the web server
@@ -234,10 +240,14 @@ spec:
 
         println@Console("Im undeploying")();
 
-
+        
         //NOTE maybe we should check that the program that should be undeployed
         // matches one that exists, so check the tags/ip in the deployment
-
+        
+        //tell the cloud_server it's going to be unloaded
+        
+        
+        
         //undeploy from cluster
         exec@Exec("kubectl delete deployment deployment"+ request.token + " --grace-period=" + request.gracePeriod)();
         exec@Exec("kubectl delete service service" + request.token)()
