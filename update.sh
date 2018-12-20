@@ -1,5 +1,7 @@
 #!/bin/sh
 
+git pull
+
 docker-compose build --parallel
 docker-compose push
 

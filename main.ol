@@ -304,7 +304,9 @@ spec:
         println@Console("User program say: " + resp)();
 
 
-        //TODO remove program from persistant storage
+        // remove program from persistant storage
+        deleteProgram@Writer(request.token)(storage_response);
+        println@Console(storage_response)();
 
         //undeploy from cluster
         exec@Exec("kubectl delete deployment deployment"+ request.token + " --grace-period=" + request.gracePeriod)();

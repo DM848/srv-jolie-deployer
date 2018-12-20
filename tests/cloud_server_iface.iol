@@ -6,6 +6,5 @@ type LoadRequest:void {
 interface CloudServerIface {
 RequestResponse:
   load(LoadRequest)(any),
-  unload(any)(void),
-  status(void)(any)
+  unload(void)(any)
 }
