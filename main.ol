@@ -245,7 +245,9 @@ spec:
         // matches one that exists, so check the tags/ip in the deployment
         
         //tell the cloud_server it's going to be unloaded
-        
+        UserService.location = "socket://service" + request.token + ":8000/";
+        unload@UserService()(resp);
+        println@Console("User program say: " + resp)();
         
         
         //undeploy from cluster
