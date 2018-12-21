@@ -7,7 +7,7 @@ include "json_utils.iol"
 outputPort JolieDeployer {
 Location: "socket://35.228.143.225:80/api/jolie-deployer/"
 // Location: "socket://localhost:8000/"
-Protocol: http
+Protocol: http {.format = "json"}
 Interfaces: Jolie_Deployer_Interface
 }
 
@@ -24,22 +24,22 @@ main
     mem_max = int(args[4]);
 
 
-    loadreq.user = "Kurt";
-    loadreq.name = "kurtsPrinterService";
-    loadreq.healthcheck = true;
-    loadreq.replicas = 1;
-    loadreq.ports[0] = 4000;
-    loadreq.cpu_min = cpu_min;
-    loadreq.cpu_max = cpu_max;
-    loadreq.mem_min = mem_min;
-    loadreq.mem_max = mem_max;
+
 
     getJsonString@JsonUtils(loadreq)(jsonstring);
 
 
     //load program in the cluster
     load@JolieDeployer({
-      .manifest = jsonstring,
+      .loadreq.user = "Kurt",
+      .loadreq.name = "kurtsPrinterService",
+      .loadreq.healthcheck = true,
+      .loadreq.replicas = 1,
+      .loadreq.ports[0] = 4000,
+      .loadreq.cpu_min = cpu_min,
+      .loadreq.cpu_max = cpu_max,
+      .loadreq.mem_min = mem_min,
+      .loadreq.mem_max = mem_max,
       .program = program
     })(response);
 

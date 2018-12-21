@@ -1,8 +1,8 @@
 // #########
 // # Health check of jolie service
 interface ServiceMeshInterface {
-    RequestResponse: 
-        health(void)(string)
+    RequestResponse:
+        health(void)(undefined)
 }
 
 // #########

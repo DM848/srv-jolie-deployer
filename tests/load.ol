@@ -7,7 +7,7 @@ include "json_utils.iol"
 outputPort JolieDeployer {
 Location: "socket://35.228.143.225:80/api/jolie-deployer/"
 // Location: "socket://localhost:8000/"
-Protocol: http
+Protocol: http {.format = "json"}
 Interfaces: Jolie_Deployer_Interface
 }
 
@@ -37,24 +37,18 @@ main
         }
     };
 
-
-    loadreq.user = "Kurt";
-    loadreq.name = "kurtsPrinterService";
-    loadreq.healthcheck = hc;
-    loadreq.replicas = replicas;
-    loadreq.ports[0] = 4000;
-    loadreq.cpu_min = 50;
-    loadreq.cpu_max = 250;
-    loadreq.mem_min = 100;
-    loadreq.mem_max = 1000;
-
-    getJsonString@JsonUtils(loadreq)(jsonstring);
-
-
     //load program in the cluster
     load@JolieDeployer({
-      .manifest = jsonstring,
-      .program = program
+      .user = "Kurt",
+      .name = "kurtsPrinterService",
+      .healthcheck = hc,
+      .program = program,
+      .replicas = replicas,
+      .ports[0] = 4000,
+      .cpu_min = 50,
+      .cpu_max = 250,
+      .mem_min = 100,
+      .mem_max = 1000
     })(response);
 
     //print the returned IP address and token of the new service
