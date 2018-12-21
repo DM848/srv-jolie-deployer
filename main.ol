@@ -165,7 +165,7 @@ spec:
     spec:
       containers:
       - name: " + token + "
-        image: dm848/srv-cloud-server:v1.0.1
+        image: joelhandig/cloud_server:latest
         imagePullPolicy: Always
         env:
         - name: TOKEN
@@ -278,6 +278,7 @@ spec:
             
             substring@StringUtils(req)(line);
             println@Console("Deployment: " + string(line))();
+            response = response + "Deployment: " + string(line) + "\n";
             
             exec@Exec("kubectl get pods -l app=" + string(line) + " ")(exec_resp);
             //println@Console(string(exec_resp))();
@@ -290,19 +291,18 @@ spec:
             undef(pod_lines.result[0]);
             for (podline in pod_lines.result)
             {
-                println@Console("\tPOD: " + podline)();
+                //println@Console("\tPOD: " + podline)();
                 
                 
-                //Get ip of pod
+                //Get name of pod
                 undef(req);
                 req = podline;
-                req.begin = 0;
-                req.end = 63;
+                req.regex = "\\s+";
+                split@StringUtils(req)(podItems);
+                println@Console("\tPod: Ready: " + podItems.result[1] + ", Status: " + podItems.result[2])();
+                response = response + "\tPod: Ready: " + podItems.result[1] + ", Status: " + podItems.result[2] + "\n";
                 
-                substring@StringUtils(req)(podname);
-                //println@Console("\tPod name: " + podname)();
-                
-                exec@Exec("kubectl get pod " + string(podname) + " -o wide")(wideoutput);
+                exec@Exec("kubectl get pod " + podItems.result[0] + " -o wide")(wideoutput);
                 //println@Console("\twide output: " + string(wideoutput))();
                 //remove header line
                 
@@ -320,13 +320,12 @@ spec:
                 
                 //println@Console("\nPid IP: " + wideItems.result[5])()
                 ip = wideItems.result[5];
-                
                 UserService.location = "socket://" + ip + ":8000/";
-                
-                //exec@Exec("curl http://" + "10.24.0.9" + ":8000/status")(curlresponse);
+                //exec@Exec("curl http://" + ip + ":8000/status")(curlresponse);
                 status@UserService()(user_status);
                 
-                println@Console("User status: " + user_status)()
+                println@Console("\t" + string(user_status))();
+                response = response + "\t" + string(user_status) + "\n"
                 
             };
             
@@ -334,7 +333,8 @@ spec:
             
             
             
-            println@Console("--------------------------------------")()
+            println@Console("--------------------------------------")();
+            response = response + "--------------------------------------\n"
         };
         
         
@@ -354,6 +354,7 @@ spec:
         //tell the cloud_server it's going to be unloaded, but only one of them...
         UserService.location = "socket://service" + request.token + ":8000/";
         unload@UserService()(resp);
+        
         println@Console("User program say: " + resp)();
 
 
