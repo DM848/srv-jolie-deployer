@@ -337,7 +337,7 @@ spec:
             
             println@Console("--------------------------------------")();
             response = response + "--------------------------------------\n"
-        };
+        }
         
         
         //str = string(cmdresp);
