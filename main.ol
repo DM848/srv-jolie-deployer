@@ -265,35 +265,35 @@ spec:
         req = string(cmdresp);
         req.regex = "\n";
         split@StringUtils(req)(lines);
-        
+
         //remove header line of output
         undef(lines.result[0]);
-        
+
         for (line in lines.result)
         {
             undef(req);
             req = line;
             req.begin = 10;
             req.end = 46;
-            
+
             substring@StringUtils(req)(line);
             println@Console("Deployment: " + string(line))();
             response = response + "Deployment: " + string(line) + "\n";
-            
+
             exec@Exec("kubectl get pods -l app=" + string(line) + " ")(exec_resp);
             //println@Console(string(exec_resp))();
-            
+
             undef(req);
             req = string(exec_resp);
             req.regex = "\n";
             split@StringUtils(req)(pod_lines);
-            
+
             undef(pod_lines.result[0]);
             for (podline in pod_lines.result)
             {
                 //println@Console("\tPOD: " + podline)();
-                
-                
+
+
                 //Get name of pod
                 undef(req);
                 req = podline;
@@ -301,43 +301,43 @@ spec:
                 split@StringUtils(req)(podItems);
                 println@Console("\tPod: Ready: " + podItems.result[1] + ", Status: " + podItems.result[2])();
                 response = response + "\tPod: Ready: " + podItems.result[1] + ", Status: " + podItems.result[2] + "\n";
-                
+
                 exec@Exec("kubectl get pod " + podItems.result[0] + " -o wide")(wideoutput);
                 //println@Console("\twide output: " + string(wideoutput))();
                 //remove header line
-                
-                
+
+
                 undef(req);
                 req = string(wideoutput);
                 req.regex = "\n";
                 split@StringUtils(req)(wideLines);
-                
-                
+
+
                 undef(req);
                 req = string(wideLines.result[1]);
                 req.regex = "\\s+";
                 split@StringUtils(req)(wideItems);
-                
+
                 //println@Console("\nPid IP: " + wideItems.result[5])()
                 ip = wideItems.result[5];
                 UserService.location = "socket://" + ip + ":8000/";
                 //exec@Exec("curl http://" + ip + ":8000/status")(curlresponse);
                 status@UserService()(user_status);
-                
+
                 println@Console("\t" + string(user_status))();
                 response = response + "\t" + string(user_status) + "\n"
-                
-            };
-            
 
-            
-            
-            
+            };
+
+
+
+
+
             println@Console("--------------------------------------")();
             response = response + "--------------------------------------\n"
         };
-        
-        
+
+
         str = string(cmdresp);
         response = cmdresp
 
@@ -345,18 +345,25 @@ spec:
 
     [unload(request)(){
 
-        println@Console("Im undeploying")();
+        println@Console("Im undeploying " + request.token + " at:")();
+        exec@Exec("sh get_pods_by_token.sh " + request.token)(ip_list);
+        req = ip_list;
+        req.regex = "[,]";
+        split@StringUtils(req)(ip_list);
+        for (ip in ip_list.result)
+        {
+            //println@Console("\tPOD: " + podline)();
+            println@Console("ip: " + ip)();
+
+            UserService.location = "socket://" + ip + ":8000/";
+            unload@UserService()(undeploy_answer); // if we do not get any answer this will be waiting forever!!!
+
+            print@Console(undeploy_answer)()
+        };
 
 
         //NOTE maybe we should check that the program that should be undeployed
         // matches one that exists, so check the tags/ip in the deployment
-
-        //tell the cloud_server it's going to be unloaded, but only one of them...
-        UserService.location = "socket://service" + request.token + ":8000/";
-        unload@UserService()(resp);
-        
-        println@Console("User program say: " + resp)();
-
 
         // remove program from persistant storage
         deleteProgram@Writer(request.token)(storage_response);
