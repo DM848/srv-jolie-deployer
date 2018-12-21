@@ -261,6 +261,8 @@ spec:
     [statusUserPrograms(user)(response){
     //    response = "Not implemented yet"
 
+        response = "";
+        
         exec@Exec("kubectl get deployments -l user=" + user)(cmdresp);
         req = string(cmdresp);
         req.regex = "\n";
@@ -322,7 +324,7 @@ spec:
                 ip = wideItems.result[5];
                 UserService.location = "socket://" + ip + ":8000/";
                 //exec@Exec("curl http://" + ip + ":8000/status")(curlresponse);
-                status@UserService()(user_status);
+                //status@UserService()(user_status);
                 
                 println@Console("\t" + string(user_status))();
                 response = response + "\t" + string(user_status) + "\n"
@@ -338,8 +340,8 @@ spec:
         };
         
         
-        str = string(cmdresp);
-        response = cmdresp
+        //str = string(cmdresp);
+        //response = cmdresp
 
         }]
 
