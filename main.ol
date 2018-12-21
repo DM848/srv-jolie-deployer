@@ -324,7 +324,7 @@ spec:
                 ip = wideItems.result[5];
                 UserService.location = "socket://" + ip + ":8000/";
                 //exec@Exec("curl http://" + ip + ":8000/status")(curlresponse);
-                //status@UserService()(user_status);
+                status@UserService()(user_status);
                 
                 println@Console("\t" + string(user_status))();
                 response = response + "\t" + string(user_status) + "\n"
