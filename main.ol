@@ -24,7 +24,10 @@ execution { concurrent }
 // Docker containers, the port here should not be set as it is exposed in the Dockerfile.
 inputPort JolieDeployerInput {
   Location: "socket://localhost:8000/"
-  Protocol: http {.format = "raw"}
+  Protocol: http {
+    .format = "json";
+    .method = "post"
+  }
   Interfaces:
     User_Service_Interface,
     Jolie_Deployer_Interface,
@@ -56,25 +59,17 @@ main
 {
     [load(request)(answer){
 
-        //All user specifications lies in request.manifest
-        getJsonValue@JsonUtils(request.manifest)(manifest);
-
-
         token = new;    //unique token that is used inside the cluster to
                         //identify this service + deployment
 
         // get free cpu
-        println@Console("get cpu ussage")();
         exec@Exec("sh get_cpu.sh")(response);
-        println@Console(response)();
         undef( response.exitCode);
         response.regex = "[ ]";
-        println@Console("split response")();
         split@StringUtils(response)(res);
 
         // getting string back as 1 1 1 1 1 1 1 900 940 870 893 640 940 778
         // find max free cpu
-        println@Console("find max cpu")();
         max_free_cpu = 0;
         for ( i = 0, i < #res.result/2, i++){
           current_free = int(res.result[i])*1000 - int(res.result[i + #res.result/2]);
@@ -85,26 +80,18 @@ main
         };
 
         // get free memory
-        println@Console("get mem ussage")();
         exec@Exec("sh get_memory.sh")(response);
-        println@Console(response)();
         undef(response.exitCode);
         response.regex = "[ ]";
-        println@Console("split response")();
         split@StringUtils(response)(res);
 
         // getting string back as 1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki,1188092Ki, 616Mi 506Mi 440Mi 660Mi 506Mi 506Mi 821000Ki
         // clean it first converting all to MB
-        println@Console("clean mem")();
         for ( i = 0, i < #res.result, i++){
-
-          println@Console("trim mem entry")();
           trim@StringUtils(res.result[i])(res.result[i]);
-          println@Console("length mem entry")();
           length@StringUtils(res.result[i])(length);
           res.result[i].end = length - 2;
           res.result[i].begin = 0;
-          println@Console("substring mem entry")();
           substring@StringUtils(res.result[i])(cleaned);
 
           check = res.result[i];
@@ -114,11 +101,9 @@ main
             res.result[i] = int(double(cleaned) / 1000)
           } else {
             res.result[i] = int(cleaned)
-          };
-          println@Console(res.result[i])()
+          }
         };
 
-        println@Console("find max free mem")();
         // find max free memory
         max_free_mem = 0;
         for ( i = 0, i < #res.result/2, i++){
@@ -130,28 +115,20 @@ main
         };
 
         // check that there is enough cpu
-        if (max_free_cpu < manifest.cpu_min){
-          println@Console("requested cpu not available")();
+        if (max_free_cpu < request.cpu_min){
           answer.status = -1
         }
         // check that there is enough memory
-        else if (max_free_mem < manifest.mem_min){
-          println@Console("requested memory not available")();
+        else if (max_free_mem < request.mem_min){
           answer.status = -1
-        } else {
-          println@Console("requested cpu + memory available")();
-
+        }
           //save the program, to be returned when the service asks for it
-          //write file to disk, so it can be retrieved when cloud_server needs it
-          //println@Console("write file")();
-          //writeFile@File({.content = request.program, .filename = token + ".ol"})();
-
-          //write in persistant storage
+          // write file to disk, so it can be retrieved when cloud_server needs it
+          // write in persistant storage
+        else {
           writeProgram@Writer({.content = request.program, .filename = token + ".ol"})(write_resp);
-          println@Console(write_resp)();
-
-        if (manifest.healthcheck)
-        {
+          if (request.healthcheck)
+          {
             stringhealthcheck =
 "        livenessProbe:
           exec:
@@ -175,9 +152,9 @@ metadata:
   name: deployment" + token + "
   labels:
     app: " + token + "
-    user: " + manifest.user + "
+    user: " + request.user + "
 spec:
-  replicas: " + manifest.replicas + "
+  replicas: " + request.replicas + "
   selector:
     matchLabels:
       app: " + token + "
@@ -198,11 +175,11 @@ spec:
           stringhealthcheck +"
         resources:
           limits:
-            cpu: " + double(manifest.cpu_max) / 1000 + "
-            memory: "+ manifest.mem_max + "Mi
+            cpu: " + double(request.cpu_max) / 1000 + "
+            memory: "+ request.mem_max + "Mi
           requests:
-            cpu: " + double(manifest.cpu_min) / 1000 +"
-            memory: "+ manifest.mem_min + "Mi\n",
+            cpu: " + double(request.cpu_min) / 1000 +"
+            memory: "+ request.mem_min + "Mi\n",
         .filename = "deployment.yaml"
       } )();
 
@@ -219,7 +196,7 @@ spec:
   - name: host
     port: 8000
     targetPort: 8000\n";
-    for ( port in manifest.ports)
+    for ( port in request.ports)
     {
         serviceString = serviceString +
 "  - name: " + new + "
@@ -257,7 +234,7 @@ spec:
           match@StringUtils(item)(matches);
 
           sleep@Time(3000)();
-          println@Console("wating for IP...")()
+          println@Console("waiting for IP...")()
       };
 
       println@Console(matches.group[1])();
@@ -314,7 +291,7 @@ spec:
     }]
 
     [ health() ( resp ) {
-        resp = "Service alive and reachable"
+      resp = "Service alive and reachable"
     }]
 
     [getProgram(token)(program){
