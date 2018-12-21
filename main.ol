@@ -261,6 +261,8 @@ spec:
     [statusUserPrograms(user)(response){
     //    response = "Not implemented yet"
 
+        response = "";
+
         exec@Exec("kubectl get deployments -l user=" + user)(cmdresp);
         req = string(cmdresp);
         req.regex = "\n";
@@ -329,18 +331,9 @@ spec:
 
             };
 
-
-
-
-
             println@Console("--------------------------------------")();
             response = response + "--------------------------------------\n"
-        };
-
-
-        str = string(cmdresp);
-        response = cmdresp
-
+          }
         }]
 
     [unload(request)(){
