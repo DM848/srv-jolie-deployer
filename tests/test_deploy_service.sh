@@ -18,7 +18,7 @@ echo $token
 #token=$(jolie load.ol testserver.ol)
 #echo $token
 
-message=$(curl http://$ip:4000/print 2> /dev/null)
+message=$(curl http://$ip:4000/print 2> /dev/null | grep -o "This is from server")
 #echo http://$ip:400/print
 echo $message
 sleep 3
@@ -34,7 +34,7 @@ fi
 
 sleep 3
 
-message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null)
+message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null | grep -o "This is from server")
 
 if [ "$message" != "This is from server" ]; then
     echo "Service undeployed"

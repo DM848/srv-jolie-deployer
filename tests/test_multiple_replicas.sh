@@ -11,21 +11,21 @@ token=${stringarray[1]}
 echo $token
 
 
-message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null)
+message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null | grep -o "This is from server")
 ret=0
 
 echo $message
 
 
-# One might think, that for i in {1..10} would be a prettier 
+# One might think, that for i in {1..10} would be a prettier
 # way to write this. In that case, one would be correct!
 for i in  1 2 3 4 5 6 7 8 9
 do
 {
-    if [ "$message" == "This is from server" ]; then 
-        echo "Message was equal" 
+    if [ "$message" == "This is from server" ]; then
+        echo "Message was equal"
         ret=$(($ret + 0))
-    else 
+    else
         echo "Message not equal"
         ret=1
     fi
@@ -36,12 +36,12 @@ done
 jolie unload.ol $token
 sleep 3
 
-message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null)
+message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null | grep -o "This is from server")
 
-if [ "$message" != "This is from server" ]; then 
-    echo "Service undeployed" 
+if [ "$message" != "This is from server" ]; then
+    echo "Service undeployed"
     exit $ret;
-else 
+else
     echo "Message not undeployed!"
     exit 1;
 fi

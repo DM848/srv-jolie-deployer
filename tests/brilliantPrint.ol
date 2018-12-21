@@ -10,7 +10,7 @@ RequestResponse:
 
 inputPort MyInput {
 Location: "socket://localhost:4000/"
-Protocol: http {.format = "raw"}
+Protocol: http {.format = "json"}
 Interfaces: MyIface
 }
 
@@ -21,7 +21,7 @@ RequestResponse:
 
 inputPort Health {
 Location: "socket://localhost:4001/"
-Protocol: http {.format = "raw"; .statusCode -> statusCode}
+Protocol: http {.format = "json"; .statusCode -> statusCode}
 Interfaces: Health
 }
 
