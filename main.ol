@@ -165,7 +165,7 @@ spec:
     spec:
       containers:
       - name: " + token + "
-        image: joelhandig/cloud_server:latest
+        image: dm848/srv-cloud-server:v1.0.1
         imagePullPolicy: Always
         env:
         - name: TOKEN
@@ -262,6 +262,82 @@ spec:
     //    response = "Not implemented yet"
 
         exec@Exec("kubectl get deployments -l user=" + user)(cmdresp);
+        req = string(cmdresp);
+        req.regex = "\n";
+        split@StringUtils(req)(lines);
+        
+        //remove header line of output
+        undef(lines.result[0]);
+        
+        for (line in lines.result)
+        {
+            undef(req);
+            req = line;
+            req.begin = 10;
+            req.end = 46;
+            
+            substring@StringUtils(req)(line);
+            println@Console("Deployment: " + string(line))();
+            
+            exec@Exec("kubectl get pods -l app=" + string(line) + " ")(exec_resp);
+            //println@Console(string(exec_resp))();
+            
+            undef(req);
+            req = string(exec_resp);
+            req.regex = "\n";
+            split@StringUtils(req)(pod_lines);
+            
+            undef(pod_lines.result[0]);
+            for (podline in pod_lines.result)
+            {
+                println@Console("\tPOD: " + podline)();
+                
+                
+                //Get ip of pod
+                undef(req);
+                req = podline;
+                req.begin = 0;
+                req.end = 63;
+                
+                substring@StringUtils(req)(podname);
+                //println@Console("\tPod name: " + podname)();
+                
+                exec@Exec("kubectl get pod " + string(podname) + " -o wide")(wideoutput);
+                //println@Console("\twide output: " + string(wideoutput))();
+                //remove header line
+                
+                
+                undef(req);
+                req = string(wideoutput);
+                req.regex = "\n";
+                split@StringUtils(req)(wideLines);
+                
+                
+                undef(req);
+                req = string(wideLines.result[1]);
+                req.regex = "\\s+";
+                split@StringUtils(req)(wideItems);
+                
+                //println@Console("\nPid IP: " + wideItems.result[5])()
+                ip = wideItems.result[5];
+                
+                UserService.location = "socket://" + ip + ":8000/";
+                
+                //exec@Exec("curl http://" + "10.24.0.9" + ":8000/status")(curlresponse);
+                status@UserService()(user_status);
+                
+                println@Console("User status: " + user_status)()
+                
+            };
+            
+
+            
+            
+            
+            println@Console("--------------------------------------")()
+        };
+        
+        
         str = string(cmdresp);
         response = cmdresp
 
@@ -275,7 +351,7 @@ spec:
         //NOTE maybe we should check that the program that should be undeployed
         // matches one that exists, so check the tags/ip in the deployment
 
-        //tell the cloud_server it's going to be unloaded
+        //tell the cloud_server it's going to be unloaded, but only one of them...
         UserService.location = "socket://service" + request.token + ":8000/";
         unload@UserService()(resp);
         println@Console("User program say: " + resp)();
