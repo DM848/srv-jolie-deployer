@@ -11,7 +11,7 @@ token=${stringarray[1]}
 echo $token
 
 
-message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null | grep -o "This is from server")
+message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null | grep -o "This is from server") 
 ret=0
 
 echo $message

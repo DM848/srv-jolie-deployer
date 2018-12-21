@@ -18,7 +18,7 @@ echo $token
 #token=$(jolie load.ol testserver.ol)
 #echo $token
 
-message=$(curl http://$ip:4000/print 2> /dev/null | grep -o "This is from server")
+message=$(curl http://$ip:4000/print 2> /dev/null | grep -o "This is from server") 
 #echo http://$ip:400/print
 echo $message
 sleep 3
