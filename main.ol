@@ -278,6 +278,7 @@ spec:
             
             substring@StringUtils(req)(line);
             println@Console("Deployment: " + string(line))();
+            response = response + "Deployment: " + string(line) + "\n";
             
             exec@Exec("kubectl get pods -l app=" + string(line) + " ")(exec_resp);
             //println@Console(string(exec_resp))();
@@ -299,6 +300,7 @@ spec:
                 req.regex = "\\s+";
                 split@StringUtils(req)(podItems);
                 println@Console("\tPod: Ready: " + podItems.result[1] + ", Status: " + podItems.result[2])();
+                response = response + "\tPod: Ready: " + podItems.result[1] + ", Status: " + podItems.result[2] + "\n";
                 
                 exec@Exec("kubectl get pod " + podItems.result[0] + " -o wide")(wideoutput);
                 //println@Console("\twide output: " + string(wideoutput))();
@@ -322,7 +324,8 @@ spec:
                 //exec@Exec("curl http://" + ip + ":8000/status")(curlresponse);
                 status@UserService()(user_status);
                 
-                println@Console("\t" + string(user_status))()
+                println@Console("\t" + string(user_status))();
+                response = response + "\t" + string(user_status) + "\n"
                 
             };
             
@@ -330,7 +333,8 @@ spec:
             
             
             
-            println@Console("--------------------------------------")()
+            println@Console("--------------------------------------")();
+            response = response + "--------------------------------------\n"
         };
         
         
