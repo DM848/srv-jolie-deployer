@@ -349,8 +349,11 @@ spec:
             println@Console("ip: " + ip)();
 
             UserService.location = "socket://" + ip + ":8000/";
-            unload@UserService()(undeploy_answer); // if we do not get any answer this will be waiting forever!!!
-
+            {
+                unload@UserService()
+                |
+                sleep@Time(2000)()
+            };
             print@Console(undeploy_answer)()
         };
 
