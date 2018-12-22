@@ -165,11 +165,15 @@ spec:
     spec:
       containers:
       - name: " + token + "
-        image: joelhandig/cloud_server:latest
+        image: dm848/srv-cloud-server:v1.1.0
         imagePullPolicy: Always
         env:
         - name: TOKEN
           value: " + token + "
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         ports:
         - containerPort: 8000\n" +
           stringhealthcheck +"
