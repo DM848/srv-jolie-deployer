@@ -12,11 +12,16 @@ spec:
         app: jolie-deployer
     spec:
       containers:
-        - image: "dm848/srv-jolie-deployer:v1"
+        - image: "dm848/srv-jolie-deployer:v1.0.1"
           imagePullPolicy: Always
           name: jolie-deployer
           ports:
             - containerPort: 8000
+          env:
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
 ---
 apiVersion: "v1"
 kind: "Service"
