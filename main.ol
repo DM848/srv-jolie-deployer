@@ -347,6 +347,10 @@ spec:
         req = ip_list;
         req.regex = "[,]";
         split@StringUtils(req)(ip_list);
+        
+        undef(ip_list.result[#ip_list.result - 1]); //remove last item, which gets read as a bug
+        
+        
         for (ip in ip_list.result)
         {
             //println@Console("\tPOD: " + podline)();
