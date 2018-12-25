@@ -4,4 +4,4 @@ services:
 
   jolie-deployer:
     build: .
-    image: dm848/srv-jolie-deployer:v1.0.1
+    image: dm848/srv-jolie-deployer:v1.0.2

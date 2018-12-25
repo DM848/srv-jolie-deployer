@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "Running test_deploy_service"
 echo "Loading service user_print..."
