@@ -1,8 +1,4 @@
-
-execution
-{
-    sequential
-}
+execution{ sequential }
 
 interface PrintInterface {
     RequestResponse: print( void )( string )
@@ -15,11 +11,9 @@ inputPort PrintService
     Interfaces: PrintInterface
 }
 
-
 main
 {
-    [print()(response)
-    {
+    [print()(response) {
         response = "This is from server"
     }]
 }

@@ -12,7 +12,7 @@ spec:
         app: jolie-deployer
     spec:
       containers:
-        - image: "dm848/srv-jolie-deployer:v1.0.1"
+        - image: "dm848/srv-jolie-deployer:v1.0.2"
           imagePullPolicy: Always
           name: jolie-deployer
           ports:

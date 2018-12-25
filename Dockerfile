@@ -1,4 +1,4 @@
-FROM dm848/cs-jolie-kubectl:v1.0.1
+FROM dm848/cs-jolie-kubectl:v1.1.1
 
 WORKDIR /service
 COPY . /service

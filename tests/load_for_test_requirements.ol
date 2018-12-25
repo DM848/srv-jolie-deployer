@@ -1,16 +1,8 @@
 include "console.iol"
-include "../jolie_deployer_interface.iol"
 include "file.iol"
 include "json_utils.iol"
 
-
-outputPort JolieDeployer {
-Location: "socket://35.228.143.225:80/api/jolie-deployer/" 
-// Location: "socket://localhost:8000/"
-Protocol: http {.format = "json"}
-Interfaces: Jolie_Deployer_Interface
-}
-
+include "JDport.ol"
 
 main
 {
@@ -45,5 +37,4 @@ main
 
     //print the returned IP address and token of the new service
     println@Console(response.status + " " + response.token)()
-
 }
