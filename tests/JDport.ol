@@ -1,9 +1,15 @@
 include "../jolie_deployer_interface.iol"
 
 // JSend is the json format used by the ACL to standarise all output to simplify system integration for the dashboard
-type JSend:void {
+type JSendLoad:void {
     .status: string
     .data?: UserLoadResponse
+    .message?: string
+    .http_code?: int
+}
+type JSendUnload:void {
+    .status: string
+    .data?: UserUnloadRequest
     .message?: string
     .http_code?: int
 }
@@ -11,8 +17,8 @@ type JSend:void {
 interface JDClientInterface
 {
     RequestResponse:
-        load(UserLoadRequest)(JSend),
-        unload(UserUnloadRequest)(void)
+        load(UserLoadRequest)(JSendLoad),
+        unload(UserUnloadRequest)(JSendUnload)
 }
 
 outputPort JolieDeployer {
