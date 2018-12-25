@@ -347,18 +347,22 @@ spec:
         req = ip_list;
         req.regex = "[,]";
         split@StringUtils(req)(ip_list);
+        
+        undef(ip_list.result[#ip_list.result - 1]); //remove last item, which gets read as a bug
+        
         for (ip in ip_list.result)
         {
-            //println@Console("\tPOD: " + podline)();
             println@Console("ip: " + ip)();
-
+            
             UserService.location = "socket://" + ip + ":8000/";
             {
-                unload@UserService()
+                //unload@UserService()
+                println@Console("unloading from ip " + ip)()
                 |
                 sleep@Time(2000)()
-            };
-            print@Console(undeploy_answer)()
+            }
+            
+            
         };
 
 
@@ -366,8 +370,8 @@ spec:
         // matches one that exists, so check the tags/ip in the deployment
 
         // remove program from persistant storage
-        deleteProgram@Writer(request.token)(storage_response);
-        println@Console(storage_response)();
+        //deleteProgram@Writer(request.token)(storage_response);
+        //println@Console(storage_response)();
 
         //undeploy from cluster
         exec@Exec("kubectl delete deployment deployment"+ request.token + " --grace-period=" + request.gracePeriod)();
