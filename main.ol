@@ -174,7 +174,7 @@ spec:
         - name: TOKEN
           value: " + token + "
         - name: JOLIE_WEB_PORT
-          value: " + webPort + "
+          value: \"" + webPort + "\"
         - name: MY_POD_IP
           valueFrom:
             fieldRef:
