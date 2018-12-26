@@ -62,6 +62,9 @@ main
         token = new;    //unique token that is used inside the cluster to
                         //identify this service + deployment
 
+        // if webPort is set, this port is routed through the ACL service, allowing external communication.
+        webPort = "8080"; // can be dynamically set by the user manifest
+
         // get free cpu
         exec@Exec("sh get_cpu.sh")(response);
         undef( response.exitCode);
@@ -165,11 +168,13 @@ spec:
     spec:
       containers:
       - name: " + token + "
-        image: dm848/srv-cloud-server:v1.1.0
+        image: dm848/srv-cloud-server:v2.0.1
         imagePullPolicy: Always
         env:
         - name: TOKEN
           value: " + token + "
+        - name: JOLIE_WEB_PORT
+          value: " + webPort + "
         - name: MY_POD_IP
           valueFrom:
             fieldRef:
