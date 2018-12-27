@@ -216,7 +216,7 @@ spec:
       serviceString = serviceString +
 "  selector:
     app: " + token + "
-  type: LoadBalancer\n";
+  type: ClusterIP\n";
 
       writeFile@File({.content = serviceString, .filename = "service" + token + ".yaml"})();
 
@@ -227,7 +227,7 @@ spec:
       print@Console(execResponse)();
       
       //just return the token here
-      answer = token
+      answer.token = token
       
 
 /*
