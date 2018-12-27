@@ -17,18 +17,15 @@ type JSendUnload:void {
 interface JDClientInterface
 {
     RequestResponse:
-        load(UserLoadRequest)(JSendLoad),
-        unload(UserUnloadRequest)(JSendUnload)
+        load(UserLoadRequest)(string),
+        unload(UserUnloadRequest)(string)
 }
 
 outputPort JolieDeployer {
     Location: "socket://35.228.7.206:8888/api/jolie-deployer/"
     Protocol: http {
         .format = "json";
-        .compression = false;
-        .debug = true {
-            .showContent = true
-        }
+        .compression = false
      }
     Interfaces: JDClientInterface
 }

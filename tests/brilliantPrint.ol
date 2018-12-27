@@ -9,7 +9,7 @@ RequestResponse:
 }
 
 inputPort MyInput {
-Location: "socket://localhost:4000/"
+Location: "socket://localhost:8080/"
 Protocol: http {.format = "json"}
 Interfaces: MyIface
 }

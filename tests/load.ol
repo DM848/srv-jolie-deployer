@@ -37,14 +37,18 @@ main
       .healthcheck = hc,
       .program = program,
       .replicas = replicas,
-      .ports[0] = 4000,
+      .ports[0] = 8080,
       .cpu_min = 50,
       .cpu_max = 250,
       .mem_min = 100,
       .mem_max = 1000
     })(response);
 
+    //messege is returned as a STRING, so this must be parsed by the user that 
+    //uploaded the the script
+    getJsonValue@JsonUtils(response)(dataresponse);
+    
     //print the returned IP address and token of the new service
-    println@Console(response.ip + " " + response.token)()
+    println@Console(dataresponse.data.token)()
 
 }
