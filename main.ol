@@ -371,8 +371,7 @@ spec:
             
             
         };
-
-
+        
         //NOTE maybe we should check that the program that should be undeployed
         // matches one that exists, so check the tags/ip in the deployment
 
