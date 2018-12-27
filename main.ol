@@ -362,15 +362,12 @@ spec:
        
         for (ip in ip_list.result)
         {
-            println@Console("ip: " + ip)();
             
             UserService.location = "socket://" + ip + ":8000/";
-            {
-                //unload@UserService()
-                println@Console("unloading from ip " + ip)()
-                |
-                sleep@Time(2000)()
-            }
+            
+            unload@UserService();
+            
+            println@Console("unloading from ip " + ip)()
             
             
         };
