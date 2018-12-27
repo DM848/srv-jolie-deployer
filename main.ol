@@ -189,7 +189,7 @@ spec:
           requests:
             cpu: " + double(request.cpu_min) / 1000 +"
             memory: "+ request.mem_min + "Mi\n",
-        .filename = "deployment.yaml"
+        .filename = "deployment" + token + ".yaml"
       } )();
 
       serviceString =
@@ -218,12 +218,12 @@ spec:
     app: " + token + "
   type: LoadBalancer\n";
 
-      writeFile@File({.content = serviceString, .filename = "service.yaml"})();
+      writeFile@File({.content = serviceString, .filename = "service" + token + ".yaml"})();
 
       //create new deployment and service
-      exec@Exec("kubectl create -f deployment.yaml")(execResponse);
+      exec@Exec("kubectl create -f deployment" + token + ".yaml")(execResponse);
       println@Console(execResponse)();
-      exec@Exec("kubectl create -f service.yaml")(execResponse);
+      exec@Exec("kubectl create -f service" + token + ".yaml")(execResponse);
       print@Console(execResponse)();
 
 
