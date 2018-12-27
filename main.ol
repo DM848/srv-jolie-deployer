@@ -191,7 +191,7 @@ spec:
             memory: "+ request.mem_min + "Mi\n",
         .filename = "deployment" + token + ".yaml"
       } )();
-
+/*
       serviceString =
 "apiVersion: v1
 kind: Service
@@ -217,16 +217,20 @@ spec:
 "  selector:
     app: " + token + "
   type: LoadBalancer\n";
-
-      writeFile@File({.content = serviceString, .filename = "service" + token + ".yaml"})();
+*/
+    //  writeFile@File({.content = serviceString, .filename = "service" + token + ".yaml"})();
 
       //create new deployment and service
       exec@Exec("kubectl create -f deployment" + token + ".yaml")(execResponse);
       println@Console(execResponse)();
-      exec@Exec("kubectl create -f service" + token + ".yaml")(execResponse);
-      print@Console(execResponse)();
+     // exec@Exec("kubectl create -f service" + token + ".yaml")(execResponse);
+     // print@Console(execResponse)();
+      
+      //just return the token here
+      answer = token;
+      
 
-
+/*
       //Following while-loop blocks until the kubernetes cluster
       //has allocated a new public ip. This usually takes 60 seconds
 
@@ -256,7 +260,7 @@ spec:
       answer.ip = string(PubIP);
       answer.token = token;
       answer.status = 0 // no error
-
+*/
       /*
       //log action
       logentry.service = "jolie-deployer";
