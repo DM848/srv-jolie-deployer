@@ -6,7 +6,7 @@ interface PrintInterface {
 
 inputPort PrintService
 {
-    Location: "socket://localhost:4000/"
+    Location: "socket://localhost:8080/"
     Protocol: http {.format = "json"}
     Interfaces: PrintInterface
 }

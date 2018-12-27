@@ -23,6 +23,12 @@ interface JDClientInterface
 
 outputPort JolieDeployer {
     Location: "socket://35.228.7.206:8888/api/jolie-deployer/"
-    Protocol: http {.format = "json"}
+    Protocol: http {
+        .format = "json";
+        .compression = false;
+        .debug = true {
+            .showContent = true
+        }
+     }
     Interfaces: JDClientInterface
 }
