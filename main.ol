@@ -168,7 +168,7 @@ spec:
     spec:
       containers:
       - name: " + token + "
-        image: dm848/srv-cloud-server:v2.0.3
+        image: dm848/srv-cloud-server:v3.0.0
         imagePullPolicy: Always
         env:
         - name: TOKEN
