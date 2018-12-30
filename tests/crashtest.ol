@@ -10,8 +10,8 @@ RequestResponse:
 }
 
 inputPort MyInput {
-Location: "socket://localhost:4000/"
-Protocol: http {.format = "raw"}
+Location: "socket://localhost:8080/"
+Protocol: http {.format = "json"}
 Interfaces: MyIface
 }
 

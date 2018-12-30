@@ -1,18 +1,14 @@
 #!/bin/bash
 
 
-resp=$(jolie load.ol user_server.ol 3 0)
+token=$(jolie load.ol user_server.ol 3 0)
 
-stringarray=($resp)
-
-
-ip=${stringarray[0]}
-token=${stringarray[1]}
 echo $token
 
+sleep 12
+message=$(curl http://35.228.7.206:8888/script/$token/print --max-time 5 2> /dev/null | grep -o "This is from server") 
 
-message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null | grep -o "This is from server") 
-ret=0
+
 
 echo $message
 
@@ -34,9 +30,9 @@ done
 
 
 jolie unload.ol $token
-sleep 3
+sleep 60
 
-message=$(curl http://$ip:4000/print --max-time 5 2> /dev/null | grep -o "This is from server")
+message=$(curl http://35.228.7.206:8888/script/$token/print --max-time 5 2> /dev/null | grep -o "This is from server") 
 
 if [ "$message" != "This is from server" ]; then
     echo "Service undeployed"
