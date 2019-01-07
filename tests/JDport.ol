@@ -17,8 +17,9 @@ type JSendUnload:void {
 interface JDClientInterface
 {
     RequestResponse:
-        load(UserLoadRequest)(string),
-        unload(UserUnloadRequest)(string)
+        load(UserLoadRequest)(undefined),
+        unload(UserUnloadRequest)(undefined),
+        statusUserPrograms(string)(undefined)
 }
 
 outputPort JolieDeployer {

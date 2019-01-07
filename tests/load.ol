@@ -46,9 +46,9 @@ main
 
     //messege is returned as a STRING, so this must be parsed by the user that 
     //uploaded the the script
-    getJsonValue@JsonUtils(response)(dataresponse);
+    //getJsonValue@JsonUtils(response)(dataresponse);
     
     //print the returned IP address and token of the new service
-    println@Console(dataresponse.data.token)()
+    println@Console(response.data.token)()
 
 }

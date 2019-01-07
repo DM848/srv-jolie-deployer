@@ -21,7 +21,7 @@ echo $token
 #echo $token
 
 #message=$(curl http://$ip:4000/print 2> /dev/null | grep -o "This is from server")
- sleep 12
+ sleep 20
 message=$(curl http://35.228.7.206:8888/script/$token/print 2> /dev/null | grep -o "This is from server") 
 sleep 3
 #echo http://$ip:400/print

@@ -3,7 +3,7 @@ include "file.iol"
 include "json_utils.iol"
 
 include "JDport.ol"
-# include "JDport_localhost.ol"
+// include "JDport_localhost.ol"
 
 main
 {
@@ -24,18 +24,33 @@ main
 
     //load program in the cluster
     load@JolieDeployer({
-      .loadreq.user = "Kurt",
-      .loadreq.name = "kurtsPrinterService",
-      .loadreq.healthcheck = true,
-      .loadreq.replicas = 1,
-      .loadreq.ports[0] = 4000,
-      .loadreq.cpu_min = cpu_min,
-      .loadreq.cpu_max = cpu_max,
-      .loadreq.mem_min = mem_min,
-      .loadreq.mem_max = mem_max,
+      .user = "Kurt",
+      .name = "kurtsPrinterService",
+      .healthcheck = true,
+      .replicas = 1,
+      .ports[0] = 8080,
+      .cpu_min = cpu_min,
+      .cpu_max = cpu_max,
+      .mem_min = mem_min,
+      .mem_max = mem_max,
       .program = program
     })(response);
+    
+    /*
+    load@JolieDeployer({
+      .user = "Kurt",
+      .name = "kurtsPrinterService",
+      .healthcheck = false,
+      .program = program,
+      .replicas = 1,
+      .ports[0] = 8080,loadreq
+      .cpu_min = 50,
+      .cpu_max = 250,
+      .mem_min = 100,
+      .mem_max = 1000
+    })(response);
+    */
 
     //print the returned IP address and token of the new service
-    println@Console(response.status + " " + response.token)()
+    println@Console(response.data.status + " " + response.data.token)()
 }
